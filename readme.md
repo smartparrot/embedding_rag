@@ -10,9 +10,12 @@ This project is based on the llama_index framework and references the project ht
 It is worth noting that embedding_rerank_retrieval uses the llama_index framework to generate data by calling OpenAI's API. This project improves upon this by enabling the entire development process to use local models with the llama_index framework, thus reducing development costs and enhancing data security.
 
 ### Training Phase:
-(1) Data Preprocessing: Segment professional corpus data to provide material for subsequent data generation, and divide it into training and validation sets.
-(2) Data Generation: Generate QA pairs based on preprocessed data chunks using an LLM.
-(3) Train Embedding Model: Use the generated QA pair data to train the text embedding model.
+(1) Data Preprocessing
+Segment professional corpus data to provide material for subsequent data generation, and divide it into training and validation sets.
+(2) Data Generation
+Generate QA pairs based on preprocessed data chunks using an LLM.
+(3) Train Embedding Model
+Use the generated QA pair data to train the text embedding model.
 
 ### Segmentation Method:
 To better enable the LLM to summarize answers, we adopt a segmentation method that preserves complete semantic units wherever possible. If the original Word document contains headings, we can treat the content between adjacent headings as a single segment.
@@ -32,8 +35,11 @@ Subheading 1.2: [Content 1.2]
 If some document chunks are too long, they can be further divided into sub-chunks, with overlapping text between adjacent segments to help the LLM recognize they belong to the same document chunk.
 
 ### Project Usage Steps
-pip3 install -r requirements.txt -i https://pypi.doubanio.com/simple 
+
+pip3 install -r requirements.txt
+
 (Note: In actual use, the software versions do not necessarily need to match exactly; they just need to work.)
+
 cd embedding_rag
 
 (1) Segment the original document to obtain the dataset
