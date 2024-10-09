@@ -32,31 +32,38 @@ Subheading 1.2: [Content 1.2]
 If some document chunks are too long, they can be further divided into sub-chunks, with overlapping text between adjacent segments to help the LLM recognize they belong to the same document chunk.
 
 ### Project Usage Steps
-pip3 install -r requirements.txt -i https://pypi.doubanio.com/simple (Note: In actual use, the software versions do not necessarily need to match exactly; they just need to work.)
+pip3 install -r requirements.txt -i https://pypi.doubanio.com/simple 
+(Note: In actual use, the software versions do not necessarily need to match exactly; they just need to work.)
 cd embedding_rag
 
 (1) Segment the original document to obtain the dataset
+
 python3 doc/wordconvert2txt.py
+
 (In this example, due to formatting issues, the original document did not have heading styles, so the entire document was segmented into equal lengths.)
 
 (2) Generate training data
+
 python3 dataset/dataset_pro.py
 
 (3) Train Text Embedding Model
 Set the paths for the training set, validation set, pre-trained embedding model, and the path to the fine-tuned embedding model in embedding_finetune/train.py. For example, using the m3e model:
+
 python3 embedding_finetune/train.py
 
 (4) Preparation Before Evaluation
 Deploy the model: python3 embedding_service/embedding_server.py
 Generate embeddings for the validation set:
+
 python3 evaluate/build_embedding_cache.py
 
 (5) Evaluate the Embedding Model
 Uses the evaluation method from embedding_rerank_retrieval, simplified here to only evaluate the embedding model.
+
 python3 evaluate/evaluation.py
 
 
-
+中文
 
 基于LLM的知识问答智能体的基于原理是先通过向量检索找到与用户query最相关的文档，然后将这些文档和任务指令拼接为一个prompt发送给LLM, 由LLM进行提炼总结最终的答案。
 这种实现方式对于提升LLM在不熟悉的领域的问答方面具有显著优势，简单来说，它可以限定LLM的回答范围，避免幻觉式的回答，这种方法有助于LLM在一些比较专业的领域知识库进行问答。
@@ -89,26 +96,38 @@ python3 evaluate/evaluation.py
 切分时有的文档块可能内容过长，这时我们才会将过长的文档可切分为多个子块，并且相邻块之间有一定的字数重叠，帮助LLM发现它们属于同一个文档块。
 
 三、项目使用方法(步骤)
-pip3 install -r requirements.txt -i https://pypi.doubanio.com/simple (实际使用时不一定要与这些软件版本完全一致，能跑起来就行)
+
+pip3 install -r requirements.txt -i https://pypi.doubanio.com/simple 
+(实际使用时不一定要与这些软件版本完全一致，能跑起来就行)
+
 cd embedding_rag
 
 (1) 切分原文档得到数据集
+
 python3 doc/wordconvert2txt.py
+
 (这个例子中的原始文档由于格式问题没有heading style，对整篇文档进行了等长度的切分。)
 
 (2)生成训练数据
+
 python3 dataset/dataset_pro.py
 
 (3)训练文本嵌入模型
 设置embedding_finetune/train.py中的训练集、验证集、预训练嵌入模型、微调后的嵌入模型的路径，这里以m3e模型为例，然后执行：
+
 python3 embedding_finetune/train.py
 
 (4)评估前准备
-部署模型：python3 embedding_service/embedding_server.py
+部署模型：
+
+python3 embedding_service/embedding_server.py
+
 验证集的嵌入向量：
+
 python3 evaluate/build_embedding_cache.py
 
 (5)评估嵌入模型
 使用了embedding_rerank_retrieval里的评估方法，这里进行了简化，只对嵌入模型进行评估。
+
 python3 evaluate/evaluation.py
 

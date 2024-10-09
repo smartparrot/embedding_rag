@@ -6,7 +6,7 @@ def is_heading(paragraph, heading_style_names):
     return paragraph.style.name in heading_style_names
 
 def concatenate_paragraphs(paragraphs):
-    # 连接多个段落为一个字符串，并保留换行�?
+    # 连接多个段落为一个字符串，并保留换行
     return '\n'.join([p.text for p in paragraphs])
 
 def split_paragraph(paragraph, title, max_length=512, overlap_length=50):
@@ -39,19 +39,19 @@ def read_word_document(file_name, file_path, heading_style_names=None):
     
     for paragraph in doc.paragraphs:
         
-        if is_heading(paragraph, heading_style_names): # encounter the seond title, combine the first title and contents
+        if is_heading(paragraph, heading_style_names): # encounter the seond title, combine the first title and its content
             if current_paragraphs:
                 # 当前段落已收集完毕，加入结果列表
                 result.append((file_name, current_title, concatenate_paragraphs(current_paragraphs)))
                 current_paragraphs = []  # 清空当前段落
             current_title = paragraph.text.strip()
-            current_paragraphs = []  # 初始化当前段落列�?
+            current_paragraphs = []  # 初始化当前段落列
         else: # encounter the first title
-            # 如果不是标题，则将非空段落添加到当前段落列表�?
+            # 如果不是标题，则将非空段落添加到当前段落列表
             if paragraph.text.strip():
                 current_paragraphs.append(paragraph)
     
-    # 处理最后一个段�?
+    # 处理最后一个段
     if current_paragraphs:
         result.append((file_name, current_title, concatenate_paragraphs(current_paragraphs)))
 
@@ -80,6 +80,6 @@ def generate_txt_files(results, max_length=512, overlap_length=50):
 if __name__ == "__main__":
     input_file = "doc/xiyouji.docx"
     file_name = "xiyouji.docx"
-    heading_styles = ['Heading 1', 'Heading 2', 'Heading 3'] 
+    heading_styles = ['Heading 1', 'Heading 2', 'Heading 3']  # heading_styles is related with your document as diffferent format doc might have different heading_style
     paragraphs = read_word_document(file_name, input_file, heading_styles)
     generate_txt_files(paragraphs, max_length=512, overlap_length=50)
