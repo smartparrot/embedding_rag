@@ -5,7 +5,7 @@
 
 本项目基于llama_index框架，并参考了项目https://github.com/percent4/embedding_rerank_retrieval
 
-需要注意的是embedding_rerank_retrieval使用llama_index框架在进行数据生成时调用了OpenAI的API实现，本项目对此进行了改进，使得llama_index可以完全使用本地模型进行全流程的开发，从而可以降低开发成本并提升了数据安全。
+需要注意的是llama_index的官网在进行数据生成时调用了OpenAI的API实现，本项目对此进行了改进，从而使得llama_index可以完全使用本地模型进行全流程的开发，从而可以降低开发成本并提升数据安全。
 
 一、训练阶段：
 (1)数据预处理：对专业语料数据进行切分为后续数据生成提供材料，并划分为训练集和验证集。
@@ -78,7 +78,7 @@ In practical applications, when using pre-trained text embedding models (such as
 
 This project is based on the llama_index framework and references the project https://github.com/percent4/embedding_rerank_retrieval.
 
-It is worth noting that embedding_rerank_retrieval uses the llama_index framework to generate data by calling OpenAI's API. This project improves upon this by enabling the entire development process to use local models with the llama_index framework, thus reducing development costs and enhancing data security.
+It is worth noting that on llama_index website, it generates data by calling OpenAI's API. This project improves this by enabling the entire development process by using local models with the llama_index framework, thus reducing development costs and enhancing data security.
 
 ### Training Phase:
 (1) Data Preprocessing
