@@ -1,4 +1,73 @@
-###
+
+基于LLM的知识问答智能体的基于原理是先通过向量检索找到与用户query最相关的文档，然后将这些文档和任务指令拼接为一个prompt发送给LLM, 由LLM进行提炼总结最终的答案。
+这种实现方式对于提升LLM在不熟悉的领域的问答方面具有显著优势，简单来说，它可以限定LLM的回答范围，避免幻觉式的回答，这种方法有助于LLM在一些比较专业的领域知识库进行问答。
+实际应用中，利用预训练的文本嵌入模型(如bge/m3e/bce等模型)进行向量检索时，在专业知识领域检索效果未必很好，这是因为预训练的文本嵌入模型一般是在通用语料上进行训练，不能很好的表征专业知识领域文本特征。因而，为了提高向量检索的准确性，我们可以利用专业领域知识文档数据对预训练的文本嵌入模型进行微调，从而提升向量检索的准确性。
+
+本项目基于llama_index框架，并参考了项目https://github.com/percent4/embedding_rerank_retrieval
+
+需要注意的是embedding_rerank_retrieval使用llama_index框架在进行数据生成时调用了OpenAI的API实现，本项目对此进行了改进，使得llama_index可以完全使用本地模型进行全流程的开发，从而可以降低开发成本并提升了数据安全。
+
+一、训练阶段：
+(1)数据预处理：对专业语料数据进行切分为后续数据生成提供材料，并划分为训练集和验证集。
+(2)数据生成：使用预处理的数据块基于LLM生成问答对。
+(3)训练嵌入模型：使用生成的问答对数据对文本嵌入模型进行训练。
+
+二、切分方式：
+为了让LLM更好的汇总答案，我们尽可能的采用具有完整语义的段落划分的方式。假如原word文档具有标题, 我们可以把标题和相邻标题之间的内容作为一个整体段落。
+例如：
+标题1
+[内容1]
+标题1.1
+[内容1.1]
+标题1.2
+[内容1.2]
+
+切分后得到如下文档块：
+标题1：[内容1]
+标题1.1：[内容1.1]
+标题1.2：[内容1.2]
+
+切分时有的文档块可能内容过长，这时我们才会将过长的文档可切分为多个子块，并且相邻块之间有一定的字数重叠，帮助LLM发现它们属于同一个文档块。
+
+三、项目使用方法(步骤)
+
+pip3 install -r requirements.txt -i https://pypi.doubanio.com/simple 
+(实际使用时不一定要与这些软件版本完全一致，能跑起来就行)
+
+cd embedding_rag
+
+(1) 切分原文档得到数据集
+
+python3 doc/wordconvert2txt.py
+
+(这个例子中的原始文档由于格式问题没有heading style，对整篇文档进行了等长度的切分。)
+
+(2)生成训练数据
+
+python3 dataset/dataset_pro.py
+
+(3)训练文本嵌入模型
+设置embedding_finetune/train.py中的训练集、验证集、预训练嵌入模型、微调后的嵌入模型的路径：
+
+python3 embedding_finetune/train.py
+
+(4)评估前准备
+部署模型：
+
+python3 embedding_service/embedding_server.py
+
+验证集的嵌入向量：
+
+python3 evaluate/build_embedding_cache.py
+
+(5)评估嵌入模型
+使用了embedding_rerank_retrieval里的评估方法，这里进行了简化，只对嵌入模型进行评估。
+
+python3 evaluate/evaluation.py
+
+
+
+### 
 The principle behind the intelligent agent for knowledge-based question answering based on Large Language Models (LLMs) involves first using vector retrieval to find the most relevant documents to the user's query. These documents are then concatenated with task instructions into a prompt, which is sent to the LLM for processing. The LLM refines and summarizes the information to produce the final answer.
 
 This approach has significant advantages in improving the LLM's ability to answer questions in unfamiliar domains. Simply put, it restricts the LLM's response scope, avoiding hallucinatory answers. This method helps the LLM perform question-and-answer tasks within more specialized knowledge bases.
@@ -53,7 +122,7 @@ python3 doc/wordconvert2txt.py
 python3 dataset/dataset_pro.py
 
 (3) Train Text Embedding Model
-Set the paths for the training set, validation set, pre-trained embedding model, and the path to the fine-tuned embedding model in embedding_finetune/train.py. For example, using the m3e model:
+Set the paths for the training set, validation set, pre-trained embedding model, and the path to the fine-tuned embedding model in embedding_finetune/train.py:
 
 python3 embedding_finetune/train.py
 
@@ -65,75 +134,6 @@ python3 evaluate/build_embedding_cache.py
 
 (5) Evaluate the Embedding Model
 Uses the evaluation method from embedding_rerank_retrieval, simplified here to only evaluate the embedding model.
-
-python3 evaluate/evaluation.py
-
-
-中文
-
-基于LLM的知识问答智能体的基于原理是先通过向量检索找到与用户query最相关的文档，然后将这些文档和任务指令拼接为一个prompt发送给LLM, 由LLM进行提炼总结最终的答案。
-这种实现方式对于提升LLM在不熟悉的领域的问答方面具有显著优势，简单来说，它可以限定LLM的回答范围，避免幻觉式的回答，这种方法有助于LLM在一些比较专业的领域知识库进行问答。
-实际应用中，利用预训练的文本嵌入模型(如bge/m3e/bce等模型)进行向量检索时，在专业知识领域检索效果未必很好，这是因为预训练的文本嵌入模型一般是在通用语料上进行训练，不能很好的表征专业知识领域文本特征。因而，为了提高向量检索的准确性，我们可以利用专业领域知识文档数据对预训练的文本嵌入模型进行微调，从而提升向量检索的准确性。
-
-本项目基于llama_index框架，并参考了项目https://github.com/percent4/embedding_rerank_retrieval
-
-需要注意的是embedding_rerank_retrieval使用llama_index框架在进行数据生成时调用了OpenAI的API实现，本项目对此进行了改进，使得llama_index可以完全使用本地模型进行全流程的开发，从而可以降低开发成本并提升了数据安全。
-
-一、训练阶段：
-(1)数据预处理：对专业语料数据进行切分为后续数据生成提供材料，并划分为训练集和验证集。
-(2)数据生成：使用预处理的数据块基于LLM生成问答对。
-(3)训练嵌入模型：使用生成的问答对数据对文本嵌入模型进行训练。
-
-二、切分方式：
-为了让LLM更好的汇总答案，我们尽可能的采用具有完整语义的段落划分的方式。假如原word文档具有标题, 我们可以把标题和相邻标题之间的内容作为一个整体段落。
-例如：
-标题1
-[内容1]
-标题1.1
-[内容1.1]
-标题1.2
-[内容1.2]
-
-切分后得到如下文档块：
-标题1：[内容1]
-标题1.1：[内容1.1]
-标题1.2：[内容1.2]
-
-切分时有的文档块可能内容过长，这时我们才会将过长的文档可切分为多个子块，并且相邻块之间有一定的字数重叠，帮助LLM发现它们属于同一个文档块。
-
-三、项目使用方法(步骤)
-
-pip3 install -r requirements.txt -i https://pypi.doubanio.com/simple 
-(实际使用时不一定要与这些软件版本完全一致，能跑起来就行)
-
-cd embedding_rag
-
-(1) 切分原文档得到数据集
-
-python3 doc/wordconvert2txt.py
-
-(这个例子中的原始文档由于格式问题没有heading style，对整篇文档进行了等长度的切分。)
-
-(2)生成训练数据
-
-python3 dataset/dataset_pro.py
-
-(3)训练文本嵌入模型
-设置embedding_finetune/train.py中的训练集、验证集、预训练嵌入模型、微调后的嵌入模型的路径，这里以m3e模型为例，然后执行：
-
-python3 embedding_finetune/train.py
-
-(4)评估前准备
-部署模型：
-
-python3 embedding_service/embedding_server.py
-
-验证集的嵌入向量：
-
-python3 evaluate/build_embedding_cache.py
-
-(5)评估嵌入模型
-使用了embedding_rerank_retrieval里的评估方法，这里进行了简化，只对嵌入模型进行评估。
 
 python3 evaluate/evaluation.py
 
