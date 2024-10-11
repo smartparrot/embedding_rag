@@ -31,7 +31,7 @@
 
 三、项目使用方法(步骤)
 
-pip3 install -r requirements.txt -i https://pypi.doubanio.com/simple 
+pip3 install -r requirements.txt
 (实际使用时不一定要与这些软件版本完全一致，能跑起来就行)
 
 cd embedding_rag
@@ -61,12 +61,14 @@ python3 embedding_service/embedding_server.py
 python3 evaluate/build_embedding_cache.py
 
 (5)评估嵌入模型
-使用了embedding_rerank_retrieval里的评估方法，这里进行了简化，只对嵌入模型进行评估。
+与embedding_rerank_retrieval里的评估方法一样，这里通过计算召回命中率等指标只对嵌入模型进行评估。
 
 python3 evaluate/evaluation.py
 
 
 
+
+English version 
 ### 
 The principle behind the intelligent agent for knowledge-based question answering based on Large Language Models (LLMs) involves first using vector retrieval to find the most relevant documents to the user's query. These documents are then concatenated with task instructions into a prompt, which is sent to the LLM for processing. The LLM refines and summarizes the information to produce the final answer.
 
@@ -133,7 +135,7 @@ Generate embeddings for the validation set:
 python3 evaluate/build_embedding_cache.py
 
 (5) Evaluate the Embedding Model
-Uses the evaluation method from embedding_rerank_retrieval, simplified here to only evaluate the embedding model.
+Evaluation method is the same as project embedding_rerank_retrieval, here only evaluate the embedding model.
 
 python3 evaluate/evaluation.py
 
